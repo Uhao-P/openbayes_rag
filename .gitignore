@@ -21,5 +21,5 @@ rag_storage
 venv/
 examples/input/
 examples/output/
-__pycache__/
+openbayes_rag/__pycache__/
 *.pyc
