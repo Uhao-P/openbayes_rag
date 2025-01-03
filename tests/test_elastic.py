@@ -6,7 +6,12 @@ from openbayes_rag.storage import ElasticDBTool  # Make sure to replace 'your_mo
 def elastic_tool():
     with patch('elasticsearch.Elasticsearch') as mock_es:
         # Mock the Elasticsearch client
-        tool = ElasticDBTool(host='localhost', port=9200)
+        tool = ElasticDBTool(
+            host='localhost', 
+            port=9200, 
+            password='KHWwbn1uwYvp_4ADa4Rr', 
+            ca_path='/Users/yuhao/Documents/elastic/http_ca.crt'
+        )
         tool.client = MagicMock()
         yield tool
 
@@ -14,11 +19,19 @@ def test_create_index(elastic_tool):
     elastic_tool.create_index("test_index")
     elastic_tool.client.indices.create.assert_called_once_with(index="test_index", body=elastic_tool.index_settings, ignore=400)
 
+    
 def test_bulk_insert(elastic_tool):
     documents = [{"id": "1", "text": "Hello"}]
+    expected_actions = [
+        {
+            "_index": "test_index",
+            "_id": "1",
+            "_source": {"id": "1", "text": "Hello"}
+        }
+    ]
     elastic_tool.bulk_insert("test_index", documents)
-    expected_actions = [{"_index": "test_index", "_id": "1", "_source": {"id": "1", "text": "Hello"}}]
     elastic_tool.client.bulk.assert_called_once_with(body=expected_actions, index="test_index")
+
 
 def test_search(elastic_tool):
     query = "Hello"

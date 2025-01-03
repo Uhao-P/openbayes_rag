@@ -6,10 +6,17 @@ from dataclasses import dataclass
 class ElasticDBTool:
     host: str = "localhost"
     port: int = 9200
+    password: str = None
     index_settings: dict = None
-
+    ca_path: str = None
+    
     def __post_init__(self):
-        self.client = Elasticsearch([{'host': self.host, 'port': self.port}])
+        self.client = Elasticsearch(
+            [{'host': self.host, 'port': self.port, 'scheme': 'https'}],
+            basic_auth = ('elastic', self.password),
+            ca_certs= self.ca_path,
+            verify_certs=True 
+        )
         if self.index_settings is None:
             self.index_settings = {
                 "settings": {
@@ -37,12 +44,18 @@ class ElasticDBTool:
     def create_index(self, index_name):
         self.client.indices.create(index=index_name, body=self.index_settings, ignore=400)
 
-    def bulk_insert(self, index_name, documents):
+    
+    def bulk_insert(self, index, documents):
         actions = [
-            {"_index": index_name, "_id": doc.get("id", None), "_source": doc}
+            {
+                "_index": index,
+                "_id": doc["id"],
+                "_source": doc
+            }
             for doc in documents
         ]
-        helpers.bulk(self.client, actions)
+        self.client.bulk(body=actions, index=index)
+
 
     def search(self, index_name, query, fields):
         body = {
