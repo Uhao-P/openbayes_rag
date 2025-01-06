@@ -5,14 +5,6 @@ import numpy as np
 
 from .utils import EmbeddingFunc
 
-TextChunkSchema = TypedDict(
-    "TextChunkSchema",
-    {"tokens": int, "content": str, "full_doc_id": str, "chunk_order_index": int},
-)
-
-T = TypeVar("T")
-
-
 @dataclass
 class QueryParam:
     mode: Literal["local", "global", "hybrid"] = "global"
@@ -44,47 +36,6 @@ class StorageNameSpace:
     async def query_done_callback(self):
         """commit the storage operations after querying"""
         pass
-
-
-@dataclass
-class BaseVectorStorage(StorageNameSpace):
-    embedding_func: EmbeddingFunc
-    meta_fields: set = field(default_factory=set)
-
-    async def query(self, query: str, top_k: int) -> list[dict]:
-        raise NotImplementedError
-
-    async def upsert(self, data: dict[str, dict]):
-        """Use 'content' field from value for embedding, use key as id.
-        If embedding_func is None, use 'embedding' field from value
-        """
-        raise NotImplementedError
-
-
-@dataclass
-class BaseKVStorage(Generic[T], StorageNameSpace):
-    embedding_func: EmbeddingFunc
-
-    async def all_keys(self) -> list[str]:
-        raise NotImplementedError
-
-    async def get_by_id(self, id: str) -> Union[T, None]:
-        raise NotImplementedError
-
-    async def get_by_ids(
-        self, ids: list[str], fields: Union[set[str], None] = None
-    ) -> list[Union[T, None]]:
-        raise NotImplementedError
-
-    async def filter_keys(self, data: list[str]) -> set[str]:
-        """return un-exist keys"""
-        raise NotImplementedError
-
-    async def upsert(self, data: dict[str, T]):
-        raise NotImplementedError
-
-    async def drop(self):
-        raise NotImplementedError
 
 
 @dataclass
