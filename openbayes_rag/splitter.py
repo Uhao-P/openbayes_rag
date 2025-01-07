@@ -5,6 +5,7 @@ from typing import List, Optional, Union, Literal
 这个类主要用于处理需要按特定分隔符分割的序列数据（如文本、令牌等），并且可以控制分割后的块大小和块之间的重叠，常见于自然语言处理任务中，如分割文本为处理单元等。
 '''
 class DocumentSeparatorSplitter:
+    
     '''
     ### 类定义和初始化方法 `__init__`
     - **参数**:
@@ -16,7 +17,6 @@ class DocumentSeparatorSplitter:
     - `chunk_size`: 指定每个文本块的最大长度。
     - `chunk_overlap`: 指定文本块之间的重叠长度。
     - `length_function`: 用于计算文本块长度的函数，默认为 `len` 函数。
-
     '''
     def __init__(
         self,
