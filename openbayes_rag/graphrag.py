@@ -184,10 +184,11 @@ class GraphRAG:
             # 利用 gpt-4o 将文本处理成token,再按照max token进行分割,返回 md5:chunk-token 字典
             inserting_chunks = get_chunks(
                 new_docs=new_docs,
-                chunk_func=self.chunk_func,
                 overlap_token_size=self.chunk_overlap_token_size,
                 max_token_size=self.chunk_token_size,
             )
+            
+            "------------------------------------修改到这里-------------------------------------------"
             
 
             _add_chunk_keys = await self.text_chunks.filter_keys(
